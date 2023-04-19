@@ -11,10 +11,16 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type Session struct {
-	client *http.Client
+	client  *http.Client
+	Headers *KV
+	Cookies *KV
+	BaseUrl string
+	Timeout time.Duration
+	Proxies string
 }
 
 func NewSession() *Session {
@@ -30,6 +36,7 @@ func NewSession() *Session {
 		client: &http.Client{
 			Jar:       jar,
 			Transport: transport,
+			Timeout:   0 * time.Second,
 		},
 	}
 }
@@ -99,6 +106,13 @@ func (p *P) prepare(r *http.Request) error {
 	}
 	return err
 }
+
+func (s *Session) prepare(r *http.Request) error {
+	prepareHeaders(s.Headers, r)
+	prepareCookies(s.Cookies, r)
+	return nil
+}
+
 func prepareHeaders(headers *KV, r *http.Request) {
 	if headers != nil {
 		for key, val := range *headers {

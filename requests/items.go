@@ -1,5 +1,7 @@
 package requests
 
+import "time"
+
 type KV map[string]string
 
 type J map[string]interface{}
@@ -26,4 +28,5 @@ type P struct {
 	Form              *KV
 	Proxies           string
 	NotAllowRedirects bool
+	Timeout           time.Duration
 }
