@@ -111,16 +111,9 @@ func main() {
 协程0请求的TlsHashMd5:907ddc4b40855e3e820900940c1d539d	协程0请求的Proto:HTTP/2
 协程2请求的TlsHashMd5:1e6ce23b75d203e2880b6c35a6039aef	协程2请求的Proto:HTTP/2
 ```
-### (五)post请求
+### (五)POST请求
+1.POST FILES and FormData
 ```go
-package main
-
-import (
-	"fmt"
-	"github.com/ghostcfl/go-requests/requests"
-	"os"
-)
-
 func postFormAndFiles() {
 	file, err := os.ReadFile("1.txt")
 	if err != nil {
@@ -143,7 +136,9 @@ func postFormAndFiles() {
 
 	fmt.Println(resp.Text())
 }
-
+```
+2. POST JSON
+```go
 func postJson() {
 	// use J struct
 	resp, err := requests.Post("https://httpbin.org/post", requests.PP{
@@ -167,11 +162,11 @@ func postJson() {
 	if err != nil {
 		return
 	}
-
 	fmt.Println(resp.Text())
-
 }
-
+```
+3. POST URLEncoded
+```go
 func postUrlencoded() {
 	// use KV struct
 	resp, err := requests.Post("https://httpbin.org/post", requests.PP{
@@ -193,9 +188,34 @@ func postUrlencoded() {
 	}
 	fmt.Println(resp.Text())
 }
-
+```
+(六)使用Session
+```go
 func main() {
-	postUrlencoded()
-}
+	session := requests.NewSession()
+	session.Headers = &requests.KV{
+		"user-agent": "my-ua",
+	}
+	session.Cookies = &requests.KV{
+		"token": "my-cookies-token",
+	}
+	session.BaseUrl = "https://httpbin.org"
 
+	resp, err := session.Get("/cookies/set", requests.GP{
+		Params: &requests.KV{
+			"free": "true",
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(resp.Text())
+	resp, err = session.Get("/get", requests.GP{
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(resp.Text())
+	fmt.Println(session.Cookies.Get("free"))
+}
 ```

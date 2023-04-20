@@ -54,3 +54,11 @@ type PP struct {
 	NotAllowRedirects bool
 	Timeout           time.Duration
 }
+
+func (k KV) Set(name string, value string) {
+	k[name] = value
+}
+
+func (k KV) Get(name string) string {
+	return k[name]
+}

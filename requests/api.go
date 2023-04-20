@@ -43,6 +43,10 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 		session.client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		}
+	} else {
+		session.client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return nil
+		}
 	}
 
 	req, err := http.NewRequest(p.Method, url, nil)
@@ -66,6 +70,14 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if session.client.Jar != nil {
+		for _, cookie := range session.client.Jar.Cookies(req.URL) {
+			session.Cookies.Set(cookie.Name, cookie.Value)
+		}
+		fmt.Println(session.Cookies)
+	}
+
 	return &Response{
 		Content:    respBody,
 		StatusCode: resp.StatusCode,

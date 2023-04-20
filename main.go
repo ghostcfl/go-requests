@@ -80,5 +80,28 @@ func postUrlencoded() {
 }
 
 func main() {
-	postUrlencoded()
+	session := requests.NewSession()
+	session.Headers = &requests.KV{
+		"user-agent": "my-ua",
+	}
+	session.Cookies = &requests.KV{
+		"token": "my-cookies-token",
+	}
+	session.BaseUrl = "https://httpbin.org"
+
+	resp, err := session.Get("/cookies/set", requests.GP{
+		Params: &requests.KV{
+			"free": "true",
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(resp.Text())
+	resp, err = session.Get("/get", requests.GP{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(resp.Text())
+	fmt.Println(session.Cookies.Get("free"))
 }
