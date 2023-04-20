@@ -23,6 +23,8 @@ type Session struct {
 	Proxies string
 }
 
+const defaultUserAgent = "go-requests/0.0.1"
+
 func NewSession() *Session {
 	jar, _ := cookiejar.New(nil)
 	transport := &http.Transport{
@@ -118,6 +120,11 @@ func prepareHeaders(headers *KV, r *http.Request) {
 		for key, val := range *headers {
 			r.Header.Set(key, val)
 		}
+		if r.Header.Get("user-agent") == "" {
+			r.Header.Set("user-agent", defaultUserAgent)
+		}
+	} else {
+		r.Header.Set("user-agent", defaultUserAgent)
 	}
 }
 
