@@ -74,3 +74,126 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 		Cookie:     resp.Cookies(),
 	}, nil
 }
+
+func (s *Session) Get(url string, gp GP) (*Response, error) {
+	return s.Request(url, P{
+		Params:            gp.Params,
+		Headers:           gp.Headers,
+		Cookies:           gp.Cookies,
+		Proxies:           gp.Proxies,
+		NotAllowRedirects: gp.NotAllowRedirects,
+		Timeout:           gp.Timeout,
+	})
+}
+
+func (s *Session) Delete(url string, gp GP) (*Response, error) {
+	return s.Request(url, P{
+		Method:            "DELETE",
+		Params:            gp.Params,
+		Headers:           gp.Headers,
+		Cookies:           gp.Cookies,
+		Proxies:           gp.Proxies,
+		NotAllowRedirects: gp.NotAllowRedirects,
+		Timeout:           gp.Timeout,
+	})
+}
+
+func (s *Session) Post(url string, pp PP) (*Response, error) {
+	return s.Request(url, P{
+		Method:            "POST",
+		Params:            pp.Params,
+		Data:              pp.Data,
+		DataString:        pp.DataString,
+		Json:              pp.Json,
+		JsonString:        pp.JsonString,
+		Headers:           pp.Headers,
+		Cookies:           pp.Cookies,
+		Files:             pp.Files,
+		Form:              pp.Form,
+		Proxies:           pp.Proxies,
+		NotAllowRedirects: pp.NotAllowRedirects,
+		Timeout:           pp.Timeout,
+	})
+}
+
+func (s *Session) Put(url string, pp PP) (*Response, error) {
+	return s.Request(url, P{
+		Method:            "PUT",
+		Params:            pp.Params,
+		Data:              pp.Data,
+		DataString:        pp.DataString,
+		Json:              pp.Json,
+		JsonString:        pp.JsonString,
+		Headers:           pp.Headers,
+		Cookies:           pp.Cookies,
+		Files:             pp.Files,
+		Form:              pp.Form,
+		Proxies:           pp.Proxies,
+		NotAllowRedirects: pp.NotAllowRedirects,
+		Timeout:           pp.Timeout,
+	})
+}
+
+func Request(url string, p P) (*Response, error) {
+	s := NewSession()
+	return s.Request(url, p)
+}
+
+func Get(url string, gp GP) (*Response, error) {
+	return Request(url, P{
+		Params:            gp.Params,
+		Headers:           gp.Headers,
+		Cookies:           gp.Cookies,
+		Proxies:           gp.Proxies,
+		NotAllowRedirects: gp.NotAllowRedirects,
+		Timeout:           gp.Timeout,
+	})
+}
+
+func Delete(url string, gp GP) (*Response, error) {
+	return Request(url, P{
+		Method:            "DELETE",
+		Params:            gp.Params,
+		Headers:           gp.Headers,
+		Cookies:           gp.Cookies,
+		Proxies:           gp.Proxies,
+		NotAllowRedirects: gp.NotAllowRedirects,
+		Timeout:           gp.Timeout,
+	})
+}
+
+func Post(url string, pp PP) (*Response, error) {
+	return Request(url, P{
+		Method:            "POST",
+		Params:            pp.Params,
+		Data:              pp.Data,
+		DataString:        pp.DataString,
+		Json:              pp.Json,
+		JsonString:        pp.JsonString,
+		Headers:           pp.Headers,
+		Cookies:           pp.Cookies,
+		Files:             pp.Files,
+		Form:              pp.Form,
+		Proxies:           pp.Proxies,
+		NotAllowRedirects: pp.NotAllowRedirects,
+		Timeout:           pp.Timeout,
+	})
+}
+
+func Put(url string, pp PP) (*Response, error) {
+	return Request(url, P{
+		Method:            "PUT",
+		Params:            pp.Params,
+		Data:              pp.Data,
+		DataString:        pp.DataString,
+		Json:              pp.Json,
+		JsonString:        pp.JsonString,
+		Headers:           pp.Headers,
+		Cookies:           pp.Cookies,
+		Files:             pp.Files,
+		Form:              pp.Form,
+		Proxies:           pp.Proxies,
+		NotAllowRedirects: pp.NotAllowRedirects,
+		Timeout:           pp.Timeout,
+	})
+}
