@@ -3,7 +3,6 @@ package requests
 import (
 	"bytes"
 	"crypto/tls"
-	"fmt"
 	"io"
 	"math/rand"
 	"mime/multipart"
@@ -176,7 +175,6 @@ func prepareFiles(files *Files, form *KV, r *http.Request) error {
 	multipartWriter := multipart.NewWriter(requestBody)
 	defer multipartWriter.Close()
 	// 设置请求头
-	fmt.Println(r.Header.Get("content-type"))
 	if r.Header.Get("content-type") == "" {
 		r.Header.Set("content-type", multipartWriter.FormDataContentType())
 	}

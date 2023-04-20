@@ -12,7 +12,6 @@ import (
 func (session *Session) Request(url string, p P) (*Response, error) {
 	var err error
 	if p.Method == "" {
-		fmt.Println(p.Method)
 		p.Method = "GET"
 	}
 
