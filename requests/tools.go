@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func MapToJsonString(m *J) (string, error) {
+func MapToJsonString(m J) (string, error) {
 	jsonString, err := json.Marshal(m)
 	if err != nil {
 		return "", err
@@ -15,12 +15,12 @@ func MapToJsonString(m *J) (string, error) {
 	return string(jsonString), nil
 }
 
-func MapToQueryString(m *KV) string {
+func MapToQueryString(m KV) string {
 	// Create a new url.Values object
 	values := url.Values{}
 
 	// Loop through the map and add each key-value pair to the url.Values object
-	for key, value := range *m {
+	for key, value := range m {
 		values.Add(key, value)
 	}
 

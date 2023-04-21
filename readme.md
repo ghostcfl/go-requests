@@ -28,7 +28,7 @@ import (
 
 func main() {
 	resp, err := requests.Get("https://httpbin.org/get", requests.GP{
-		Headers: &requests.KV{
+		Headers: requests.KV{
 			"token":      "token1",
 			"user-agent": "my-user-agent",
 		},
@@ -120,13 +120,13 @@ func postFormAndFiles() {
 		return
 	}
 	resp, err := requests.Post("https://httpbin.org/post", requests.PP{
-		Files: &requests.Files{
+		Files: requests.Files{
 			"file1": requests.F{
 				Filename: "hello.txt",
 				Buffer:   file,
 			},
 		},
-		Form: &requests.KV{
+		Form: requests.KV{
 			"username": "caifuliang",
 		},
 	})
@@ -142,7 +142,7 @@ func postFormAndFiles() {
 func postJson() {
 	// use J struct
 	resp, err := requests.Post("https://httpbin.org/post", requests.PP{
-		Json: &requests.J{
+		Json: requests.J{
 			"a": "b",
 			"b": []string{"1", "2", "3"},
 			"c": requests.KV{
@@ -152,6 +152,7 @@ func postJson() {
 		},
 	})
 	if err != nil {
+		panic(err)
 		return
 	}
 	fmt.Println(resp.Text())
@@ -160,6 +161,7 @@ func postJson() {
 		JsonString: `{"a":"b","b":["1","2","3"],"c":{"c1":"val c1","c22":"val c2"}}`,
 	})
 	if err != nil {
+		panic(err)
 		return
 	}
 	fmt.Println(resp.Text())
@@ -170,7 +172,7 @@ func postJson() {
 func postUrlencoded() {
 	// use KV struct
 	resp, err := requests.Post("https://httpbin.org/post", requests.PP{
-		Data: &requests.KV{
+		Data: requests.KV{
 			"a":    "b",
 			"name": "caifuliang",
 		},
@@ -189,7 +191,7 @@ func postUrlencoded() {
 	fmt.Println(resp.Text())
 }
 ```
-(六)使用Session
+### (六)使用Session
 ```go
 func main() {
 	session := requests.NewSession()

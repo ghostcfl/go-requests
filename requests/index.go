@@ -16,14 +16,14 @@ import (
 
 type Session struct {
 	client  *http.Client
-	Headers *KV
-	Cookies *KV
+	Headers KV
+	Cookies KV
 	BaseUrl string
 	Timeout time.Duration
 	Proxies string
 }
 
-const defaultUserAgent = "go-requests/0.0.3"
+const defaultUserAgent = "go-requests/0.0.4"
 
 func NewSession() *Session {
 	jar, _ := cookiejar.New(nil)
@@ -115,9 +115,9 @@ func (s *Session) prepare(r *http.Request) error {
 	return nil
 }
 
-func prepareHeaders(headers *KV, r *http.Request) {
+func prepareHeaders(headers KV, r *http.Request) {
 	if headers != nil {
-		for key, val := range *headers {
+		for key, val := range headers {
 			r.Header.Set(key, val)
 		}
 		fmt.Println(fmt.Sprintf("ua:%s", r.Header.Get("user-agent")))
@@ -131,17 +131,17 @@ func prepareHeaders(headers *KV, r *http.Request) {
 	}
 }
 
-func prepareQuery(params *KV, r *http.Request) {
+func prepareQuery(params KV, r *http.Request) {
 	if params != nil {
 		query := r.URL.Query()
-		for key, value := range *params {
+		for key, value := range params {
 			query.Set(key, value)
 		}
 		r.URL.RawQuery = query.Encode()
 	}
 }
 
-func prepareData(data *KV, r *http.Request) {
+func prepareData(data KV, r *http.Request) {
 	if data != nil {
 		d := MapToQueryString(data)
 		r.Body = stringToReadCloser(d)
@@ -154,7 +154,7 @@ func prepareDataString(s string, r *http.Request) {
 	}
 }
 
-func prepareJson(data *J, r *http.Request) error {
+func prepareJson(data J, r *http.Request) error {
 	if data != nil {
 		j, err := MapToJsonString(data)
 		if err != nil {
@@ -171,7 +171,7 @@ func prepareJsonString(s string, r *http.Request) {
 	}
 }
 
-func prepareFiles(files *Files, form *KV, r *http.Request) error {
+func prepareFiles(files Files, form KV, r *http.Request) error {
 	var err error
 	// Create a new buffer to write the request body
 	requestBody := &bytes.Buffer{}
@@ -184,7 +184,7 @@ func prepareFiles(files *Files, form *KV, r *http.Request) error {
 	}
 
 	if files != nil {
-		for fieldName, file := range *files {
+		for fieldName, file := range files {
 			f := io.Reader(bytes.NewReader(file.Buffer))
 			part, err := multipartWriter.CreateFormFile(fieldName, file.Filename)
 			if err != nil {
@@ -195,7 +195,7 @@ func prepareFiles(files *Files, form *KV, r *http.Request) error {
 	}
 
 	if form != nil {
-		for key, val := range *form {
+		for key, val := range form {
 			formFieldWriter, err := multipartWriter.CreateFormField(key)
 			if err != nil {
 				return err
@@ -213,9 +213,9 @@ func prepareFiles(files *Files, form *KV, r *http.Request) error {
 	return err
 }
 
-func prepareCookies(cookies *KV, r *http.Request) {
+func prepareCookies(cookies KV, r *http.Request) {
 	if cookies != nil {
-		for key, val := range *cookies {
+		for key, val := range cookies {
 			ck := &http.Cookie{Name: key, Value: val}
 			r.AddCookie(ck)
 		}

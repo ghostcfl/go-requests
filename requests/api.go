@@ -73,9 +73,8 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 
 	if session.client.Jar != nil {
 		for _, cookie := range session.client.Jar.Cookies(req.URL) {
-			session.Cookies.Set(cookie.Name, cookie.Value)
+			session.Cookies[cookie.Name] = cookie.Value
 		}
-		fmt.Println(session.Cookies)
 	}
 
 	return &Response{
