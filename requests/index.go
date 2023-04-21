@@ -23,7 +23,7 @@ type Session struct {
 	Proxies string
 }
 
-const defaultUserAgent = "go-requests/0.0.5"
+const defaultUserAgent = "go-requests/0.0.6"
 
 func NewSession() *Session {
 	jar, _ := cookiejar.New(nil)
