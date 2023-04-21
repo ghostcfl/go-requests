@@ -40,6 +40,8 @@ func NewSession() *Session {
 			Transport: transport,
 			Timeout:   0 * time.Second,
 		},
+		Headers: KV{},
+		Cookies: KV{},
 	}
 }
 
