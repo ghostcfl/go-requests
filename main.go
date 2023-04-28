@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/ghostcfl/go-requests/requests"
+	"net/http"
 	"os"
 )
 
@@ -126,7 +127,7 @@ func useSession() {
 		"user-agent": "my-ua",
 	}
 	session.Cookies = requests.KV{
-		"token": "my-cookies-token",
+		"token": `"my-cookies-token"`,
 	}
 	session.BaseUrl = "https://httpbin.org"
 
@@ -138,6 +139,7 @@ func useSession() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(resp.Cookie)
 	fmt.Println(resp.Text())
 	resp, err = session.Get("/get", requests.GP{})
 	if err != nil {
@@ -145,8 +147,11 @@ func useSession() {
 	}
 	fmt.Println(resp.Text())
 	fmt.Println(session.Cookies)
+
+	ck := http.Cookie{}
+	ck.Valid()
 }
 
 func main() {
-	postUrlencoded()
+	useSession()
 }

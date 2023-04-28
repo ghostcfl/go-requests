@@ -9,6 +9,14 @@ import (
 	"time"
 )
 
+func setCookies(cookies KV, cookiesJar []*http.Cookie) {
+	for _, cookie := range cookiesJar {
+		if cookies.Get(cookie.Name) == "" {
+			cookies.Set(cookie.Name, cookie.Value)
+		}
+	}
+}
+
 func (session *Session) Request(url string, p P) (*Response, error) {
 	var err error
 	if p.Method == "" {
@@ -41,10 +49,12 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 	// 设置重定向
 	if p.NotAllowRedirects {
 		session.client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			setCookies(session.Cookies, req.Response.Cookies())
 			return http.ErrUseLastResponse
 		}
 	} else {
 		session.client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			setCookies(session.Cookies, req.Response.Cookies())
 			return nil
 		}
 	}
@@ -71,17 +81,14 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 		return nil, err
 	}
 
-	if session.client.Jar != nil {
-		for _, cookie := range session.client.Jar.Cookies(req.URL) {
-			session.Cookies[cookie.Name] = cookie.Value
-		}
-	}
+	ck := KV{}
+	setCookies(ck, resp.Cookies())
 
 	return &Response{
 		Content:    respBody,
 		StatusCode: resp.StatusCode,
 		Header:     resp.Header,
-		Cookie:     resp.Cookies(),
+		Cookie:     ck,
 	}, nil
 }
 

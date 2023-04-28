@@ -3,11 +3,11 @@ package requests
 import (
 	"bytes"
 	"crypto/tls"
+	"fmt"
 	"io"
 	"math/rand"
 	"mime/multipart"
 	"net/http"
-	"net/http/cookiejar"
 	"net/url"
 	"strings"
 	"time"
@@ -22,10 +22,9 @@ type Session struct {
 	Proxies string
 }
 
-const defaultUserAgent = "go-requests/0.0.7"
+const defaultUserAgent = "go-requests/0.0.8"
 
 func NewSession() *Session {
-	jar, _ := cookiejar.New(nil)
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			CipherSuites: getCipherSuites(),
@@ -35,7 +34,6 @@ func NewSession() *Session {
 
 	return &Session{
 		client: &http.Client{
-			Jar:       jar,
 			Transport: transport,
 			Timeout:   0 * time.Second,
 		},
@@ -215,10 +213,11 @@ func prepareFiles(files Files, form KV, r *http.Request) error {
 
 func prepareCookies(cookies KV, r *http.Request) {
 	if cookies != nil {
+		var ckList []string
 		for key, val := range cookies {
-			ck := &http.Cookie{Name: key, Value: val}
-			r.AddCookie(ck)
+			ckList = append(ckList, fmt.Sprintf("%s=%s", key, val))
 		}
+		r.Header.Add("Cookie", strings.Join(ckList, "; "))
 	}
 }
 

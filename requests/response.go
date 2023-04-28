@@ -9,7 +9,7 @@ type Response struct {
 	Content    []byte
 	StatusCode int
 	Header     http.Header
-	Cookie     []*http.Cookie
+	Cookie     KV
 }
 
 func (r *Response) Text() string {
