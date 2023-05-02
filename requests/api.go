@@ -17,10 +17,10 @@ func setCookies(cookies KV, cookiesJar []*http.Cookie) {
 	}
 }
 
-func (session *Session) Request(url string, p P) (*Response, error) {
+func (session *session) Request(url string, p P) (*Response, error) {
 	var err error
 	if p.Method == "" {
-		p.Method = "GET"
+		p.Method = GET
 	}
 
 	if !strings.HasPrefix(url, "http") {
@@ -71,7 +71,22 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 		return nil, err
 	}
 
+	for _, fn := range session.beforeRequestHookFunctions {
+		err = fn(req)
+		if err != nil {
+			break
+		}
+	}
+
 	resp, err := session.client.Do(req)
+
+	for _, fn := range session.afterResponseHookFunctions {
+		err = fn(resp)
+		if err != nil {
+			break
+		}
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -92,125 +107,72 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 	}, nil
 }
 
-func (s *Session) Get(url string, gp GP) (*Response, error) {
-	return s.Request(url, P{
-		Params:            gp.Params,
-		Headers:           gp.Headers,
-		Cookies:           gp.Cookies,
-		Proxies:           gp.Proxies,
-		NotAllowRedirects: gp.NotAllowRedirects,
-		Timeout:           gp.Timeout,
-	})
+func (s *session) Get(url string, params P) (*Response, error) {
+	params.Method = GET
+	return s.Request(url, params)
 }
 
-func (s *Session) Delete(url string, gp GP) (*Response, error) {
-	return s.Request(url, P{
-		Method:            "DELETE",
-		Params:            gp.Params,
-		Headers:           gp.Headers,
-		Cookies:           gp.Cookies,
-		Proxies:           gp.Proxies,
-		NotAllowRedirects: gp.NotAllowRedirects,
-		Timeout:           gp.Timeout,
-	})
+func (s *session) Delete(url string, params P) (*Response, error) {
+	params.Method = DELETE
+	return s.Request(url, params)
 }
 
-func (s *Session) Post(url string, pp PP) (*Response, error) {
-	return s.Request(url, P{
-		Method:            "POST",
-		Params:            pp.Params,
-		Data:              pp.Data,
-		DataString:        pp.DataString,
-		Json:              pp.Json,
-		JsonString:        pp.JsonString,
-		Headers:           pp.Headers,
-		Cookies:           pp.Cookies,
-		Files:             pp.Files,
-		Form:              pp.Form,
-		Proxies:           pp.Proxies,
-		NotAllowRedirects: pp.NotAllowRedirects,
-		Timeout:           pp.Timeout,
-	})
+func (s *session) Post(url string, params P) (*Response, error) {
+	params.Method = POST
+	return s.Request(url, params)
 }
 
-func (s *Session) Put(url string, pp PP) (*Response, error) {
-	return s.Request(url, P{
-		Method:            "PUT",
-		Params:            pp.Params,
-		Data:              pp.Data,
-		DataString:        pp.DataString,
-		Json:              pp.Json,
-		JsonString:        pp.JsonString,
-		Headers:           pp.Headers,
-		Cookies:           pp.Cookies,
-		Files:             pp.Files,
-		Form:              pp.Form,
-		Proxies:           pp.Proxies,
-		NotAllowRedirects: pp.NotAllowRedirects,
-		Timeout:           pp.Timeout,
-	})
+func (s *session) Put(url string, params P) (*Response, error) {
+	params.Method = PUT
+	return s.Request(url, params)
 }
 
-func Request(url string, p P) (*Response, error) {
+func (s *session) Head(url string, params P) (*Response, error) {
+	params.Method = HEAD
+	return s.Request(url, params)
+}
+
+func (s *session) Options(url string, params P) (*Response, error) {
+	params.Method = OPTIONS
+	return s.Request(url, params)
+}
+
+func (s *session) Patch(url string, params P) (*Response, error) {
+	params.Method = PATCH
+	return s.Request(url, params)
+}
+
+func Request(url string, params P) (*Response, error) {
 	s := NewSession()
-	return s.Request(url, p)
+	return s.Request(url, params)
 }
 
-func Get(url string, gp GP) (*Response, error) {
-	return Request(url, P{
-		Params:            gp.Params,
-		Headers:           gp.Headers,
-		Cookies:           gp.Cookies,
-		Proxies:           gp.Proxies,
-		NotAllowRedirects: gp.NotAllowRedirects,
-		Timeout:           gp.Timeout,
-	})
+func Get(url string, params P) (*Response, error) {
+	params.Method = GET
+	return Request(url, params)
 }
 
-func Delete(url string, gp GP) (*Response, error) {
-	return Request(url, P{
-		Method:            "DELETE",
-		Params:            gp.Params,
-		Headers:           gp.Headers,
-		Cookies:           gp.Cookies,
-		Proxies:           gp.Proxies,
-		NotAllowRedirects: gp.NotAllowRedirects,
-		Timeout:           gp.Timeout,
-	})
+func Delete(url string, params P) (*Response, error) {
+	params.Method = DELETE
+	return Request(url, params)
 }
 
-func Post(url string, pp PP) (*Response, error) {
-	return Request(url, P{
-		Method:            "POST",
-		Params:            pp.Params,
-		Data:              pp.Data,
-		DataString:        pp.DataString,
-		Json:              pp.Json,
-		JsonString:        pp.JsonString,
-		Headers:           pp.Headers,
-		Cookies:           pp.Cookies,
-		Files:             pp.Files,
-		Form:              pp.Form,
-		Proxies:           pp.Proxies,
-		NotAllowRedirects: pp.NotAllowRedirects,
-		Timeout:           pp.Timeout,
-	})
+func Post(url string, params P) (*Response, error) {
+	params.Method = POST
+	return Request(url, params)
 }
 
-func Put(url string, pp PP) (*Response, error) {
-	return Request(url, P{
-		Method:            "PUT",
-		Params:            pp.Params,
-		Data:              pp.Data,
-		DataString:        pp.DataString,
-		Json:              pp.Json,
-		JsonString:        pp.JsonString,
-		Headers:           pp.Headers,
-		Cookies:           pp.Cookies,
-		Files:             pp.Files,
-		Form:              pp.Form,
-		Proxies:           pp.Proxies,
-		NotAllowRedirects: pp.NotAllowRedirects,
-		Timeout:           pp.Timeout,
-	})
+func Put(url string, params P) (*Response, error) {
+	params.Method = PUT
+	return Request(url, params)
+}
+
+func Head(url string, params P) (*Response, error) {
+	params.Method = HEAD
+	return Request(url, params)
+}
+
+func Options(url string, params P) (*Response, error) {
+	params.Method = OPTIONS
+	return Request(url, params)
 }

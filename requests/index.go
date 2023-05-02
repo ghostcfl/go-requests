@@ -2,113 +2,41 @@ package requests
 
 import (
 	"bytes"
-	"crypto/tls"
 	"fmt"
 	"io"
-	"math/rand"
 	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
-
-type Session struct {
-	client  *http.Client
-	Headers KV
-	Cookies KV
-	BaseUrl string
-	Timeout time.Duration
-	Proxies string
-}
-
-const defaultUserAgent = "go-requests/0.0.8"
-
-func NewSession() *Session {
-	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			CipherSuites: getCipherSuites(),
-		},
-		ForceAttemptHTTP2: true,
-	}
-
-	return &Session{
-		client: &http.Client{
-			Transport: transport,
-			Timeout:   0 * time.Second,
-		},
-		Headers: KV{},
-		Cookies: KV{},
-	}
-}
-
-func getCipherSuites() []uint16 {
-	CipherSuitesArray := []uint16{
-		tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-		tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-		tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-		tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-		tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
-		tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
-		tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
-		tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
-		tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
-		tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-		tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
-		tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
-		tls.TLS_RSA_WITH_AES_128_CBC_SHA,
-		tls.TLS_RSA_WITH_AES_256_CBC_SHA,
-		tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
-		tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA,
-		tls.TLS_AES_128_GCM_SHA256,
-		tls.TLS_AES_256_GCM_SHA384,
-		tls.TLS_CHACHA20_POLY1305_SHA256,
-	}
-	randIndex := rand.Intn(len(CipherSuitesArray))
-	return CipherSuitesArray[:randIndex]
-}
-
-func dataMethod(method string) bool {
-	switch strings.ToUpper(method) {
-	case "POST":
-		return true
-	case "PUT":
-		return true
-	default:
-		return false
-	}
-
-}
 
 func (p *P) prepare(r *http.Request) error {
 	var err error
 	prepareHeaders(p.Headers, r)
 	prepareQuery(p.Params, r)
 	prepareCookies(p.Cookies, r)
-	if dataMethod(p.Method) {
-		if p.Data != nil || p.DataString != "" {
-			if r.Header.Get("content-type") == "" {
-				r.Header.Set("content-type", "application/x-www-form-urlencoded")
-			}
-			prepareData(p.Data, r)
-			prepareDataString(p.DataString, r)
-		} else if p.Json != nil || p.JsonString != "" {
-			if r.Header.Get("content-type") == "" {
-				r.Header.Set("content-type", "application/json")
-			}
-			prepareJsonString(p.JsonString, r)
-			err = prepareJson(p.Json, r)
-			if err != nil {
-				return err
-			}
-		} else if p.Files != nil || p.Form != nil {
-			err = prepareFiles(p.Files, p.Form, r)
+	if p.Data != nil || p.DataString != "" {
+		if r.Header.Get("content-type") == "" {
+			r.Header.Set("content-type", "application/x-www-form-urlencoded")
 		}
+		prepareData(p.Data, r)
+		prepareDataString(p.DataString, r)
+	} else if p.Json != nil || p.JsonString != "" {
+		if r.Header.Get("content-type") == "" {
+			r.Header.Set("content-type", "application/json")
+		}
+		prepareJsonString(p.JsonString, r)
+		err = prepareJson(p.Json, r)
+		if err != nil {
+			return err
+		}
+	} else if p.Files != nil || p.Form != nil {
+		err = prepareFiles(p.Files, p.Form, r)
 	}
 	return err
 }
 
-func (s *Session) prepare(r *http.Request) error {
+func (s *session) prepare(r *http.Request) error {
 	prepareHeaders(s.Headers, r)
 	prepareCookies(s.Cookies, r)
 	return nil
@@ -221,7 +149,7 @@ func prepareCookies(cookies KV, r *http.Request) {
 	}
 }
 
-func prepareProxy(proxy string, session *Session) error {
+func prepareProxy(proxy string, session *session) error {
 	proxyURL, err := url.Parse(proxy)
 	if err != nil {
 		return err

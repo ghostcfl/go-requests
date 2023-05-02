@@ -32,7 +32,7 @@ type KaWaYiYiTls struct {
 }
 
 func ja3_check(name string) {
-	resp, err := requests.Get("https://kawayiyi.com/tls", requests.GP{})
+	resp, err := requests.Get("https://kawayiyi.com/tls", requests.P{})
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +51,7 @@ func postFormAndFiles() {
 	if err != nil {
 		return
 	}
-	resp, err := requests.Post("https://httpbin.org/post", requests.PP{
+	resp, err := requests.Post("https://httpbin.org/post", requests.P{
 		Files: requests.Files{
 			"file1": requests.F{
 				Filename: "hello.txt",
@@ -71,7 +71,7 @@ func postFormAndFiles() {
 
 func postJson() {
 	// use J struct
-	resp, err := requests.Post("https://httpbin.org/post", requests.PP{
+	resp, err := requests.Post("https://httpbin.org/post", requests.P{
 		Json: requests.J{
 			"a": "b",
 			"b": []string{"1", "2", "3"},
@@ -87,7 +87,7 @@ func postJson() {
 	}
 	fmt.Println(resp.Text())
 	// use JsonString
-	resp, err = requests.Post("https://httpbin.org/post", requests.PP{
+	resp, err = requests.Post("https://httpbin.org/post", requests.P{
 		JsonString: `{"a":"b","b":["1","2","3"],"c":{"c1":"val c1","c22":"val c2"}}`,
 	})
 	if err != nil {
@@ -99,7 +99,7 @@ func postJson() {
 
 func postUrlencoded() {
 	// use KV struct
-	resp, err := requests.Post("https://httpbin.org/post", requests.PP{
+	resp, err := requests.Post("https://httpbin.org/post", requests.P{
 		Data: requests.KV{
 			"a":    "b",
 			"name": "caifuliang",
@@ -111,7 +111,7 @@ func postUrlencoded() {
 	}
 	fmt.Println(resp.Text())
 	// use urlencoded string
-	resp, err = requests.Post("https://httpbin.org/post", requests.PP{
+	resp, err = requests.Post("https://httpbin.org/post", requests.P{
 		DataString: "a=b&name=caifuliang",
 	})
 	if err != nil {
@@ -131,7 +131,7 @@ func useSession() {
 	}
 	session.BaseUrl = "https://httpbin.org"
 
-	resp, err := session.Get("/cookies/set", requests.GP{
+	resp, err := session.Get("/cookies/set", requests.P{
 		Params: requests.KV{
 			"free": "true",
 		},
@@ -141,7 +141,7 @@ func useSession() {
 	}
 	fmt.Println(resp.Cookie)
 	fmt.Println(resp.Text())
-	resp, err = session.Get("/get", requests.GP{})
+	resp, err = session.Get("/get", requests.P{})
 	if err != nil {
 		panic(err)
 	}
@@ -152,6 +152,36 @@ func useSession() {
 	ck.Valid()
 }
 
+func TestHookFunction() {
+	var err error
+	session := requests.NewSession()
+
+	_, err = session.RegisterBeforeRequestHook(func(req *http.Request) error {
+		fmt.Println(req.URL)
+		return nil
+	})
+	if err != nil {
+		return
+	}
+
+	_, err = session.RegisterAfterResponseHook(func(resp *http.Response) error {
+		fmt.Println(resp.Status)
+		return nil
+
+	})
+	if err != nil {
+		return
+	}
+
+	resp, err := session.Get("https://httpbin.org/get", requests.P{})
+	if err != nil {
+		return
+	}
+
+	fmt.Println(resp.Text())
+
+}
+
 func main() {
-	useSession()
+	TestHookFunction()
 }
