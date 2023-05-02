@@ -179,7 +179,6 @@ func TestHookFunction() {
 	}
 
 	fmt.Println(resp.Text())
-
 }
 
 func main() {

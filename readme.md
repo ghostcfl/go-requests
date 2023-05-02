@@ -221,3 +221,34 @@ func main() {
 	fmt.Println(session.Cookies.Get("free"))
 }
 ```
+### (七)添加HOOK
+```go
+func TestHookFunction() {
+	var err error
+	session := requests.NewSession()
+
+	_, err = session.RegisterBeforeRequestHook(func(req *http.Request) error {
+		fmt.Println(req.URL)
+		return nil
+	})
+	if err != nil {
+		return
+	}
+
+	_, err = session.RegisterAfterResponseHook(func(resp *http.Response) error {
+		fmt.Println(resp.Status)
+		return nil
+
+	})
+	if err != nil {
+		return
+	}
+
+	resp, err := session.Get("https://httpbin.org/get", requests.P{})
+	if err != nil {
+		return
+	}
+
+	fmt.Println(resp.Text())
+}
+```
