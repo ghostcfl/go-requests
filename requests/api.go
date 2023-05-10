@@ -100,10 +100,11 @@ func (session *session) Request(url string, p P) (*Response, error) {
 	setCookies(ck, resp.Cookies())
 
 	return &Response{
-		Content:    respBody,
-		StatusCode: resp.StatusCode,
-		Header:     resp.Header,
-		Cookie:     ck,
+		Content:        respBody,
+		StatusCode:     resp.StatusCode,
+		Header:         resp.Header,
+		Cookie:         ck,
+		OriginResponse: resp,
 	}, nil
 }
 
