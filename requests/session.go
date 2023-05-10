@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type session struct {
+type Session struct {
 	client  *http.Client
 	Headers KV
 	Cookies KV
@@ -20,7 +20,7 @@ type session struct {
 	afterResponseHookFunctions []AfterResponseHookFunction
 }
 
-func NewSession() *session {
+func NewSession() *Session {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			CipherSuites: getCipherSuites(),
@@ -28,7 +28,7 @@ func NewSession() *session {
 		ForceAttemptHTTP2: true,
 	}
 
-	return &session{
+	return &Session{
 		client: &http.Client{
 			Transport: transport,
 			Timeout:   0 * time.Second,

@@ -36,7 +36,7 @@ func (p *P) prepare(r *http.Request) error {
 	return err
 }
 
-func (s *session) prepare(r *http.Request) error {
+func (s *Session) prepare(r *http.Request) error {
 	prepareHeaders(s.Headers, r)
 	prepareCookies(s.Cookies, r)
 	return nil
@@ -149,7 +149,7 @@ func prepareCookies(cookies KV, r *http.Request) {
 	}
 }
 
-func prepareProxy(proxy string, session *session) error {
+func prepareProxy(proxy string, session *Session) error {
 	proxyURL, err := url.Parse(proxy)
 	if err != nil {
 		return err

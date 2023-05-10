@@ -17,7 +17,7 @@ func setCookies(cookies KV, cookiesJar []*http.Cookie) {
 	}
 }
 
-func (session *session) Request(url string, p P) (*Response, error) {
+func (session *Session) Request(url string, p P) (*Response, error) {
 	var err error
 	if p.Method == "" {
 		p.Method = GET
@@ -108,37 +108,37 @@ func (session *session) Request(url string, p P) (*Response, error) {
 	}, nil
 }
 
-func (s *session) Get(url string, params P) (*Response, error) {
+func (s *Session) Get(url string, params P) (*Response, error) {
 	params.Method = GET
 	return s.Request(url, params)
 }
 
-func (s *session) Delete(url string, params P) (*Response, error) {
+func (s *Session) Delete(url string, params P) (*Response, error) {
 	params.Method = DELETE
 	return s.Request(url, params)
 }
 
-func (s *session) Post(url string, params P) (*Response, error) {
+func (s *Session) Post(url string, params P) (*Response, error) {
 	params.Method = POST
 	return s.Request(url, params)
 }
 
-func (s *session) Put(url string, params P) (*Response, error) {
+func (s *Session) Put(url string, params P) (*Response, error) {
 	params.Method = PUT
 	return s.Request(url, params)
 }
 
-func (s *session) Head(url string, params P) (*Response, error) {
+func (s *Session) Head(url string, params P) (*Response, error) {
 	params.Method = HEAD
 	return s.Request(url, params)
 }
 
-func (s *session) Options(url string, params P) (*Response, error) {
+func (s *Session) Options(url string, params P) (*Response, error) {
 	params.Method = OPTIONS
 	return s.Request(url, params)
 }
 
-func (s *session) Patch(url string, params P) (*Response, error) {
+func (s *Session) Patch(url string, params P) (*Response, error) {
 	params.Method = PATCH
 	return s.Request(url, params)
 }

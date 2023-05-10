@@ -47,7 +47,7 @@ func (k KV) Get(name string) string {
 }
 
 // 注册请求前的HOOK函数,返回注册成功的 index
-func (s *session) RegisterBeforeRequestHook(fn BeforeRequestHookFunction) (int, error) {
+func (s *Session) RegisterBeforeRequestHook(fn BeforeRequestHookFunction) (int, error) {
 	if s.beforeRequestHookFunctions == nil {
 		s.beforeRequestHookFunctions = make([]BeforeRequestHookFunction, 0, 8)
 	}
@@ -59,7 +59,7 @@ func (s *session) RegisterBeforeRequestHook(fn BeforeRequestHookFunction) (int, 
 }
 
 // 注销请求前的HOOK函数
-func (s *session) UnregisterBeforeRequestHook(index int) error {
+func (s *Session) UnregisterBeforeRequestHook(index int) error {
 	if index >= len(s.beforeRequestHookFunctions) {
 		return ErrIndexOutOfBound
 	}
@@ -68,12 +68,12 @@ func (s *session) UnregisterBeforeRequestHook(index int) error {
 }
 
 // 重置请求前的HOOK函数
-func (s *session) ResetBeforeRequestHook() {
+func (s *Session) ResetBeforeRequestHook() {
 	s.beforeRequestHookFunctions = []BeforeRequestHookFunction{}
 }
 
 // 注册响应后的HOOK函数,返回注册成功的 index
-func (s *session) RegisterAfterResponseHook(fn AfterResponseHookFunction) (int, error) {
+func (s *Session) RegisterAfterResponseHook(fn AfterResponseHookFunction) (int, error) {
 	if s.afterResponseHookFunctions == nil {
 		s.afterResponseHookFunctions = make([]AfterResponseHookFunction, 0, 8)
 	}
@@ -85,7 +85,7 @@ func (s *session) RegisterAfterResponseHook(fn AfterResponseHookFunction) (int, 
 }
 
 // 注销响应后的HOOK函数
-func (s *session) UnregisterAfterResponseHook(index int) error {
+func (s *Session) UnregisterAfterResponseHook(index int) error {
 	if index >= len(s.afterResponseHookFunctions) {
 		return ErrIndexOutOfBound
 	}
@@ -94,6 +94,6 @@ func (s *session) UnregisterAfterResponseHook(index int) error {
 }
 
 // 重置响应后的HOOK函数
-func (s *session) ResetAfterResponseHook() {
+func (s *Session) ResetAfterResponseHook() {
 	s.afterResponseHookFunctions = []AfterResponseHookFunction{}
 }
