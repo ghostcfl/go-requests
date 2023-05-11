@@ -27,7 +27,7 @@ import (
 )
 
 func main() {
-	resp, err := requests.Get("https://httpbin.org/get", requests.GP{
+	resp, err := requests.Get("https://httpbin.org/get", requests.P{
 		Headers: requests.KV{
 			"token":      "token1",
 			"user-agent": "my-user-agent",
@@ -75,7 +75,7 @@ type KaWaYiYiTls struct {
 }
 
 func ja3_check(name string) {
-	resp, err := requests.Get("https://kawayiyi.com/tls", requests.GP{})
+	resp, err := requests.Get("https://kawayiyi.com/tls", requests.P{})
 	if err != nil {
 		panic(err)
 	}
@@ -141,7 +141,7 @@ func postFormAndFiles() {
 ```go
 func postJson() {
 	// use J struct
-	resp, err := requests.Post("https://httpbin.org/post", requests.PP{
+	resp, err := requests.Post("https://httpbin.org/post", requests.P{
 		Json: requests.J{
 			"a": "b",
 			"b": []string{"1", "2", "3"},
@@ -157,7 +157,7 @@ func postJson() {
 	}
 	fmt.Println(resp.Text())
 	// use JsonString
-	resp, err = requests.Post("https://httpbin.org/post", requests.PP{
+	resp, err = requests.Post("https://httpbin.org/post", requests.P{
 		JsonString: `{"a":"b","b":["1","2","3"],"c":{"c1":"val c1","c22":"val c2"}}`,
 	})
 	if err != nil {
@@ -171,7 +171,7 @@ func postJson() {
 ```go
 func postUrlencoded() {
 	// use KV struct
-	resp, err := requests.Post("https://httpbin.org/post", requests.PP{
+	resp, err := requests.Post("https://httpbin.org/post", requests.P{
 		Data: requests.KV{
 			"a":    "b",
 			"name": "caifuliang",
@@ -182,7 +182,7 @@ func postUrlencoded() {
 	}
 	fmt.Println(resp.Text())
 	// use urlencoded string
-	resp, err = requests.Post("https://httpbin.org/post", requests.PP{
+	resp, err = requests.Post("https://httpbin.org/post", requests.P{
 		DataString: "a=b&name=caifuliang",
 	})
 	if err != nil {
@@ -203,7 +203,7 @@ func main() {
 	}
 	session.BaseUrl = "https://httpbin.org"
 
-	resp, err := session.Get("/cookies/set", requests.GP{
+	resp, err := session.Get("/cookies/set", requests.P{
 		Params: &requests.KV{
 			"free": "true",
 		},
@@ -212,7 +212,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(resp.Text())
-	resp, err = session.Get("/get", requests.GP{
+	resp, err = session.Get("/get", requests.P{
 	})
 	if err != nil {
 		panic(err)
