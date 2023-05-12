@@ -235,8 +235,8 @@ func TestHookFunction() {
 		return
 	}
 
-	_, err = session.RegisterAfterResponseHook(func(resp *http.Response) error {
-		fmt.Println(resp.Status)
+	_, err = session.RegisterAfterResponseHook(func(resp *requests.Response) error {
+		fmt.Println(resp.StatusCode)
 		return nil
 
 	})

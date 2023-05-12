@@ -80,13 +80,6 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 
 	resp, err := session.client.Do(req)
 
-	for _, fn := range session.afterResponseHookFunctions {
-		err = fn(resp)
-		if err != nil {
-			break
-		}
-	}
-
 	if err != nil {
 		return nil, err
 	}
@@ -99,13 +92,26 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 	ck := KV{}
 	setCookies(ck, resp.Cookies())
 
-	return &Response{
+	r := &Response{
 		Content:        respBody,
 		StatusCode:     resp.StatusCode,
 		Header:         resp.Header,
 		Cookie:         ck,
 		OriginResponse: resp,
-	}, nil
+	}
+
+	for _, fn := range session.afterResponseHookFunctions {
+		err = fn(r)
+		if err != nil {
+			break
+		}
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
 }
 
 func (s *Session) Get(url string, params P) (*Response, error) {

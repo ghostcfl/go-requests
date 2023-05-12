@@ -35,7 +35,7 @@ type (
 	}
 
 	BeforeRequestHookFunction func(*http.Request) error
-	AfterResponseHookFunction func(*http.Response) error
+	AfterResponseHookFunction func(r *Response) error
 )
 
 func (k KV) Set(name string, value string) {
