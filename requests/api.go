@@ -86,6 +86,11 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 				p.Retry++
 				return session.Request(url, p)
 			}
+		} else if session.MaxRetry > 0 {
+			if p.Retry < session.MaxRetry {
+				p.Retry++
+				return session.Request(url, p)
+			}
 		}
 		return nil, err
 	}

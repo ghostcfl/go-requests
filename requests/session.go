@@ -12,9 +12,10 @@ type Session struct {
 	Headers KV
 	Cookies KV
 
-	BaseUrl string
-	Timeout time.Duration
-	Proxies string
+	BaseUrl  string
+	Timeout  time.Duration
+	Proxies  string
+	MaxRetry int
 
 	beforeRequestHookFunctions []BeforeRequestHookFunction
 	afterResponseHookFunctions []AfterResponseHookFunction
