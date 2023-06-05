@@ -32,6 +32,8 @@ type (
 		Proxies           string
 		NotAllowRedirects bool
 		Timeout           time.Duration
+		Retry             int
+		MaxRetry          int
 	}
 
 	BeforeRequestHookFunction func(*http.Request) error

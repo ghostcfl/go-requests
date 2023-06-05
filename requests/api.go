@@ -81,6 +81,12 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 	resp, err := session.client.Do(req)
 
 	if err != nil {
+		if p.MaxRetry > 0 {
+			if p.Retry < p.MaxRetry {
+				p.Retry++
+				return session.Request(url, p)
+			}
+		}
 		return nil, err
 	}
 

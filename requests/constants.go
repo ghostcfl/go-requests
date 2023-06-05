@@ -3,7 +3,7 @@ package requests
 import "errors"
 
 const (
-	defaultUserAgent = "go-requests/1.0.4"
+	defaultUserAgent = "go-requests/1.0.5"
 
 	GET     = "GET"
 	POST    = "POST"
