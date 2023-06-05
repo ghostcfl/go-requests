@@ -17,7 +17,23 @@ func setCookies(cookies KV, cookiesJar []*http.Cookie) {
 	}
 }
 
-func (session *Session) Request(url string, p P) (*Response, error) {
+func retry(p *P, session *Session) bool {
+	fmt.Printf("retry:%d\n", p.Retry)
+	if p.MaxRetry > 0 {
+		if p.Retry < p.MaxRetry {
+			time.Sleep(30 * time.Millisecond)
+			return true
+		}
+	} else if session.MaxRetry > 0 {
+		if p.Retry < session.MaxRetry {
+			time.Sleep(30 * time.Millisecond)
+			return true
+		}
+	}
+	return false
+}
+
+func (session *Session) Request(url string, p *P) (*Response, error) {
 	var err error
 	if p.Method == "" {
 		p.Method = GET
@@ -61,6 +77,11 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 
 	req, err := http.NewRequest(p.Method, url, nil)
 	if err != nil {
+		if retry(p, session) {
+			p.Retry++
+			fmt.Printf("retry:%d", p.Retry)
+			return session.Request(url, p)
+		}
 		return nil, err
 	}
 
@@ -79,24 +100,17 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 	}
 
 	resp, err := session.client.Do(req)
-
 	if err != nil {
-		if p.MaxRetry > 0 {
-			if p.Retry < p.MaxRetry {
-				p.Retry++
-				return session.Request(url, p)
-			}
-		} else if session.MaxRetry > 0 {
-			if p.Retry < session.MaxRetry {
-				p.Retry++
-				return session.Request(url, p)
-			}
+		if retry(p, session) {
+			p.Retry++
+			return session.Request(url, p)
 		}
 		return nil, err
 	}
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
+
 		return nil, err
 	}
 
@@ -125,72 +139,72 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 	return r, nil
 }
 
-func (s *Session) Get(url string, params P) (*Response, error) {
+func (s *Session) Get(url string, params *P) (*Response, error) {
 	params.Method = GET
 	return s.Request(url, params)
 }
 
-func (s *Session) Delete(url string, params P) (*Response, error) {
+func (s *Session) Delete(url string, params *P) (*Response, error) {
 	params.Method = DELETE
 	return s.Request(url, params)
 }
 
-func (s *Session) Post(url string, params P) (*Response, error) {
+func (s *Session) Post(url string, params *P) (*Response, error) {
 	params.Method = POST
 	return s.Request(url, params)
 }
 
-func (s *Session) Put(url string, params P) (*Response, error) {
+func (s *Session) Put(url string, params *P) (*Response, error) {
 	params.Method = PUT
 	return s.Request(url, params)
 }
 
-func (s *Session) Head(url string, params P) (*Response, error) {
+func (s *Session) Head(url string, params *P) (*Response, error) {
 	params.Method = HEAD
 	return s.Request(url, params)
 }
 
-func (s *Session) Options(url string, params P) (*Response, error) {
+func (s *Session) Options(url string, params *P) (*Response, error) {
 	params.Method = OPTIONS
 	return s.Request(url, params)
 }
 
-func (s *Session) Patch(url string, params P) (*Response, error) {
+func (s *Session) Patch(url string, params *P) (*Response, error) {
 	params.Method = PATCH
 	return s.Request(url, params)
 }
 
-func Request(url string, params P) (*Response, error) {
+func Request(url string, params *P) (*Response, error) {
 	s := NewSession()
 	return s.Request(url, params)
 }
 
-func Get(url string, params P) (*Response, error) {
+func Get(url string, params *P) (*Response, error) {
 	params.Method = GET
 	return Request(url, params)
 }
 
-func Delete(url string, params P) (*Response, error) {
+func Delete(url string, params *P) (*Response, error) {
 	params.Method = DELETE
 	return Request(url, params)
 }
 
-func Post(url string, params P) (*Response, error) {
+func Post(url string, params *P) (*Response, error) {
 	params.Method = POST
 	return Request(url, params)
 }
 
-func Put(url string, params P) (*Response, error) {
+func Put(url string, params *P) (*Response, error) {
 	params.Method = PUT
 	return Request(url, params)
 }
 
-func Head(url string, params P) (*Response, error) {
+func Head(url string, params *P) (*Response, error) {
 	params.Method = HEAD
 	return Request(url, params)
 }
 
-func Options(url string, params P) (*Response, error) {
+func Options(url string, params *P) (*Response, error) {
 	params.Method = OPTIONS
 	return Request(url, params)
 }
