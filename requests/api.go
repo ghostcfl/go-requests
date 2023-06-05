@@ -74,7 +74,7 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 	for _, fn := range session.beforeRequestHookFunctions {
 		err = fn(req)
 		if err != nil {
-			break
+			return nil, err
 		}
 	}
 
@@ -103,7 +103,7 @@ func (session *Session) Request(url string, p P) (*Response, error) {
 	for _, fn := range session.afterResponseHookFunctions {
 		err = fn(r)
 		if err != nil {
-			break
+			return nil, err
 		}
 	}
 

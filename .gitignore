@@ -2,3 +2,5 @@
 .idea/
 main.go
 test/
+*.jpg
+*.png
